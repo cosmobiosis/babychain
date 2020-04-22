@@ -1,14 +1,28 @@
 from socket import AF_INET, socket, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from threading import Thread
 from argparse import ArgumentParser
-from server_utility import *
+# param is list of parameters
+
+tutorial = ["If you ever want to quit, type 'quit' to exit.\n",
+            "If you want to mine some Shitcoins from ECS153 Babychain, click the button 'mine'\n"
+            "If you want to check you balance, type 'balance' to check it\n",
+            "If you want to check people's public keys registered in this net, type 'nodes'\n",
+            "If you want to pay somebody, type 'pay <value> <public_addr>'\n"]
+BUFSIZ = 1024
+clients = {}
+addresses = {}
+
+def broadcast(msg, prefix=""):  # prefix is for name identification.
+    """Broadcasts a message to all the clients."""
+    for sock in clients:
+        sock.send(bytes(prefix, "utf8") + msg)
 
 def accept_incoming_connections():
     """Sets up handling for incoming clients."""
     while True:
         client, client_address = SERVER.accept()
         print("%s:%s has connected." % client_address)
-        client.send(bytes("Please Register Your node by typing into your allias\n", "utf8"))
+        client.send(bytes("Please type into your allias before doing any actions\n", "utf8"))
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
 
@@ -25,19 +39,19 @@ def handle_client(client):  # Takes client socket as argument.
 
     while True:
         msg = client.recv(BUFSIZ)
-        msg = msg.decode("utf-8")
-        parsed = msg.split()
-
-        if parsed[0] not in cmd:
-            broadcast(bytes(msg, "utf8"), name + ": ")
+        parsed = msg.decode("utf-8").split("$")
+        if len(parsed) > 1:
+            broadcast(msg)
+        elif msg != bytes("quit", "utf8"):
+            for each in clients:
+                print(1111111)
+            broadcast(msg, name + ": ")
         else:
-            param = []
-            for i in range(1, len(parsed)):
-                param.append(parsed[i])
-            cmd[parsed[0]](client, name, param)
-            if parsed[0] == "quit":
-                break
-
+            client.send(bytes("quit", "utf8"))
+            client.close()
+            del clients[client]
+            broadcast(bytes("%s has left the chat." % name, "utf8"))
+            break
 
 if __name__ == "__main__":
     parser = ArgumentParser()

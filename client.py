@@ -2,18 +2,20 @@ from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
 from argparse import ArgumentParser
+from backend.wallet import Wallet
 
 BUFSIZ = 1024
+wallet = Wallet()
 
 def receive():
     """Handles receiving of messages."""
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
+            msg = '\n' + msg
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Possibly client has left the chat.
             break
-
 
 def send(event=None):  # event is passed by binders.
     """Handles sending of messages."""
@@ -28,6 +30,14 @@ def on_closing(event=None):
     """This function is to be called when the window is closed."""
     my_msg.set("quit")
     send()
+
+def mine(event=None):
+    mining_broadcast_message = wallet.mine()
+    client_socket.send(bytes(mining_broadcast_message, "utf8"))
+
+def balance(event=None):
+    balance = wallet.get_balance()
+    client_socket.send(bytes(str(balance), "utf8"))
 
 if __name__ == "__main__":
     # Start Tinker Configuration
@@ -49,6 +59,10 @@ if __name__ == "__main__":
     entry_field.pack()
     send_button = tkinter.Button(top, text="Send", command=send)
     send_button.pack()
+    mine_button = tkinter.Button(top, text="Mine", command=mine)
+    mine_button.pack()
+    mine_button = tkinter.Button(top, text="Balance", command=balance)
+    mine_button.pack()
 
     top.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -69,4 +83,5 @@ if __name__ == "__main__":
 
     t = tkinter.Text(wrap=tkinter.WORD)
     t.pack()
+
     tkinter.mainloop()
