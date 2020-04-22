@@ -43,8 +43,6 @@ def handle_client(client):  # Takes client socket as argument.
         if len(parsed) > 1:
             broadcast(msg)
         elif msg != bytes("quit", "utf8"):
-            for each in clients:
-                print(1111111)
             broadcast(msg, name + ": ")
         else:
             client.send(bytes("quit", "utf8"))
