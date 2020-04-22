@@ -2,16 +2,16 @@ from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
 from argparse import ArgumentParser
-from backend.wallet import Wallet
-
-BUFSIZ = 1024
-wallet = Wallet()
+from client_utility import *
 
 def receive():
     """Handles receiving of messages."""
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
+            verification = wallet.receive_broadcast(msg)
+            if verification is not None:
+                my_msg.set(verification)
             msg = '\n' + msg
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Possibly client has left the chat.
@@ -21,6 +21,14 @@ def send(event=None):  # event is passed by binders.
     """Handles sending of messages."""
     msg = my_msg.get()
     my_msg.set("")  # Clears input field.
+    parsed = msg.split(' ')
+    if parsed[0] in cmd:
+        param = []
+        for i in range(1, len(parsed)):
+            param.append(parsed[i])
+        # Replace the msg with generated broadcast
+        msg = cmd[parsed[0]](param)
+    print(msg)
     client_socket.send(bytes(msg, "utf8"))
     if msg == "quit":
         client_socket.close()

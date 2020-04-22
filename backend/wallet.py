@@ -10,14 +10,15 @@ class Wallet:
         self._private_key = RSA.generate(1024, random_gen)
         self._public_key = self._private_key.publickey()
         self._signer = PKCS1_v1_5.new(self._private_key)
-        self.user_addr = binascii.hexlify(self._public_key.exportKey(format='DER')).decode('ascii')
+        self.user_addr = binascii.hexlify(self._public_key.exportKey(format='DER')).decode('utf-8')
 
     def receive_broadcast(self, message):
         parsed = message.split('$')
         if len(parsed) == 2:
-            self.verify_new_block(message)
+            return self.verify_new_block(message)
         if len(parsed) == 3:
-            self.verify_transaction(message)
+            return self.verify_transaction(message)
+        return None
 
     def mine(self):
         last_block = self.block_chain.blocks[-1]
@@ -33,12 +34,12 @@ class Wallet:
         mining_broadcast_message = self.user_addr + "$" + str(nonce)
         return mining_broadcast_message
 
-    def pay(self, receiver, value):
+    def pay(self, value, receiver_addr):
         balance = self.get_balance()
         if balance < value:
             raise ValueError("Insufficient Balance")
         # Has to follow the sorted key order
-        transaction = {'receiver': receiver, 'sender': self.user_addr, 'value': value}
+        transaction = {'receiver': receiver_addr, 'sender': self.user_addr, 'value': value}
         txn_message = json.dumps(transaction, sort_keys=True)
         signature = self._signer.sign(SHA.new(txn_message.encode()))
         """

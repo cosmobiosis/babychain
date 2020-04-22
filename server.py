@@ -4,11 +4,11 @@ from argparse import ArgumentParser
 # param is list of parameters
 
 tutorial = ["If you ever want to quit, type 'quit' to exit.\n",
-            "If you want to mine some Shitcoins from ECS153 Babychain, click the button 'mine'\n"
-            "If you want to check you balance, type 'balance' to check it\n",
-            "If you want to check people's public keys registered in this net, type 'nodes'\n",
+            "If you want to mine some Shitcoins from ECS153 Babychain, click the button 'mine' or type 'mine' in the terminal\n"
+            "If you want to broadcast you balance, click the button 'balance' or type 'balance'\n",
+            "If you want to broadcast your own public address, type 'addr'\n",
             "If you want to pay somebody, type 'pay <value> <public_addr>'\n"]
-BUFSIZ = 1024
+BUFSIZ = 4096
 clients = {}
 addresses = {}
 

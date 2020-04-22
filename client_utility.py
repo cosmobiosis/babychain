@@ -1,7 +1,26 @@
+from backend.wallet import Wallet
 
-"""
-param = []
-for i in range(1, len(parsed)):
-    param.append(parsed[i])
-    cmd[parsed[0]](client, name, param)
-"""
+BUFSIZ = 4096
+wallet = Wallet()
+
+def generate_transaction_broadcast(param):
+    # param is list of parameters
+    # first parameter is amount of transfer
+    # second is receiver's public address string
+    return wallet.pay(int(param[0]), param[1])
+
+def public_addr_broadcast(param):
+    return wallet.user_addr
+
+def mine(param):
+    return wallet.mine()
+
+def get_balance(param):
+    return wallet.get_balance()
+
+cmd = {
+    "pay" : generate_transaction_broadcast,
+    "addr": public_addr_broadcast,
+    "balance": get_balance,
+    "mine": mine
+}

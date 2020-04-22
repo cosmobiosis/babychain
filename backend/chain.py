@@ -9,7 +9,7 @@ from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 
-Difficulty = 2
+Difficulty = 3
 REWARD = 50
 
 class Blockchain:
