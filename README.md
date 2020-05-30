@@ -1,4 +1,4 @@
-# babychain
+# babychain hybrid mining
 baby shitcoin simulator: applied cryptography + socket programming + GUI programming
 
 ### Requirement
