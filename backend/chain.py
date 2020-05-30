@@ -82,3 +82,7 @@ class Blockchain:
             return True
         else:
             raise ValueError("Authentication Failed")
+
+    def revert(self):
+        # Revert a block
+        self.blocks.pop()
