@@ -9,9 +9,12 @@ def receive():
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
+            if "waiting" in msg:
+                print("reverting the block")
+                wallet.revert()
             verification = wallet.receive_broadcast(msg)
             if verification is not None:
-                my_msg.set(verification)
+                client_socket.send(bytes(verification, "utf8"))
             msg = '\n' + msg
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Possibly client has left the chat.
@@ -27,12 +30,17 @@ def send(event=None):  # event is passed by binders.
         for i in range(1, len(parsed)):
             param.append(parsed[i])
         # Replace the msg with generated broadcast
-        msg = cmd[parsed[0]](param)
+        msg = str(cmd[parsed[0]](param))
     print(msg)
-    client_socket.send(bytes(msg, "utf8"))
     if msg == "quit":
         client_socket.close()
         top.quit()
+        return
+    elif msg == "balance":
+        my_msg.set(msg)
+        return
+    client_socket.send(bytes(msg, "utf8"))
+
 
 def on_closing(event=None):
     """This function is to be called when the window is closed."""
@@ -45,7 +53,7 @@ def mine(event=None):
 
 def balance(event=None):
     balance = wallet.get_balance()
-    client_socket.send(bytes(str(balance), "utf8"))
+    my_msg.set("My balance is " + str(balance))
 
 if __name__ == "__main__":
     # Start Tinker Configuration

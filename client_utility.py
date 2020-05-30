@@ -9,6 +9,9 @@ def generate_transaction_broadcast(param):
     # second is receiver's public address string
     return wallet.pay(int(param[0]), param[1])
 
+def check_balance(param):
+    return wallet.check_others_balance(param[0])
+
 def public_addr_broadcast(param):
     return wallet.user_addr
 
@@ -22,5 +25,6 @@ cmd = {
     "pay" : generate_transaction_broadcast,
     "addr": public_addr_broadcast,
     "balance": get_balance,
-    "mine": mine
+    "mine": mine,
+    "check": check_balance
 }
